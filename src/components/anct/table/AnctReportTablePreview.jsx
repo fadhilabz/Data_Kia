@@ -1,9 +1,4 @@
 // components/anct/table/AnctReportTablePreview.jsx
-//
-// Ambil laporan ANCT semua Puskesmas untuk periode terpilih, lalu
-// tampilkan lewat AnctTable. Dipakai di tab "Lihat Rekapitulasi"
-// halaman petugas, dan bisa dipakai ulang di halaman admin/dataAnct.
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -12,7 +7,7 @@ import { db } from '@/lib/firebase';
 import { getAnctCollectionName } from '@/lib/anct/anctConfig';
 import AnctTable from './AnctTable';
 
-export default function AnctReportTablePreview({ selectedMonth, selectedYear }) {
+export default function AnctReportTablePreview({ selectedMonth, selectedYear, userProfile }) {
   const [reportList, setReportList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -26,11 +21,20 @@ export default function AnctReportTablePreview({ selectedMonth, selectedYear }) 
         const collectionName = getAnctCollectionName(selectedYear, selectedMonth);
         const snap = await getDocs(collection(db, collectionName));
         const rows = [];
+
         snap.forEach((d) => {
           if (d.id !== '_info') {
-            rows.push({ id: d.id, puskesmasId: d.id, ...d.data() });
+            // Filter berdasarkan role user
+            if (userProfile?.role !== 'admin_dinkes') {
+              if (d.id === userProfile?.puskesmasId) {
+                rows.push({ id: d.id, puskesmasId: d.id, ...d.data() });
+              }
+            } else {
+              rows.push({ id: d.id, puskesmasId: d.id, ...d.data() });
+            }
           }
         });
+
         rows.sort((a, b) => (a.namaPuskesmas || '').localeCompare(b.namaPuskesmas || ''));
         setReportList(rows);
       } catch (err) {
@@ -42,7 +46,7 @@ export default function AnctReportTablePreview({ selectedMonth, selectedYear }) 
     };
 
     loadData();
-  }, [selectedYear, selectedMonth]);
+  }, [selectedYear, selectedMonth, userProfile]);
 
   if (loading) {
     return (

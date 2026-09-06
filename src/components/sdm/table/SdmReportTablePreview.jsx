@@ -1,14 +1,13 @@
-// components/kematian/table/KematianReportTablePreview.jsx
+// components/sdm/table/SdmReportTablePreview.jsx
 'use client';
 
 import { useState, useEffect } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { getKematianCollectionName } from '@/lib/kematian/kematianConfig';
-import KematianTable from './KematianTable';
+import { getSdmCollectionName } from '@/lib/sdm/sdmConfig';
+import SdmTable from './SdmTable';
 
-// 1. TAMBAHKAN userProfile PADA PROPS KOMPONEN
-export default function KematianReportTablePreview({ selectedMonth, selectedYear, userProfile }) {
+export default function SdmReportTablePreview({ selectedMonth, selectedYear }) {
   const [reportList, setReportList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -19,28 +18,18 @@ export default function KematianReportTablePreview({ selectedMonth, selectedYear
     const loadData = async () => {
       setLoading(true);
       try {
-        const collectionName = getKematianCollectionName(selectedYear, selectedMonth);
+        const collectionName = getSdmCollectionName(selectedYear, selectedMonth);
         const snap = await getDocs(collection(db, collectionName));
         const rows = [];
-
         snap.forEach((d) => {
           if (d.id !== '_info') {
-            // 2. LOGIKA FILTER: Jika BUKAN admin, tampilkan hanya data milik puskesmas yang login
-            if (userProfile?.role !== 'admin_dinkes') {
-              if (d.id === userProfile?.puskesmasId) {
-                rows.push({ id: d.id, puskesmasId: d.id, ...d.data() });
-              }
-            } else {
-              // Jika Admin Dinkes, tampilkan seluruh data
-              rows.push({ id: d.id, puskesmasId: d.id, ...d.data() });
-            }
+            rows.push({ id: d.id, puskesmasId: d.id, ...d.data() });
           }
         });
-
         rows.sort((a, b) => (a.namaPuskesmas || '').localeCompare(b.namaPuskesmas || ''));
         setReportList(rows);
       } catch (err) {
-        console.error('KematianReportTablePreview loadData error:', err);
+        console.error('SdmReportTablePreview loadData error:', err);
         setReportList([]);
       } finally {
         setLoading(false);
@@ -48,7 +37,7 @@ export default function KematianReportTablePreview({ selectedMonth, selectedYear
     };
 
     loadData();
-  }, [selectedYear, selectedMonth, userProfile]);
+  }, [selectedYear, selectedMonth]);
 
   if (loading) {
     return (
@@ -70,7 +59,7 @@ export default function KematianReportTablePreview({ selectedMonth, selectedYear
           className="pl-8 pr-3 py-1.5 bg-gray-100 rounded-lg text-xs text-gray-700 border border-gray-300 outline-none focus:ring-2 focus:ring-emerald-500 w-full"
         />
       </div>
-      <KematianTable reportList={reportList} searchQuery={searchQuery} />
+      <SdmTable reportList={reportList} searchQuery={searchQuery} />
     </div>
   );
 }

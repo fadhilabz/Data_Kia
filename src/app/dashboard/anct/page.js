@@ -149,7 +149,7 @@ export default function FormANCTPage() {
       </div>
 
       {activeViewTab === 'preview' ? (
-        <AnctReportTablePreview selectedMonth={selectedMonth} selectedYear={selectedYear} />
+        <AnctReportTablePreview selectedMonth={selectedMonth} selectedYear={selectedYear} userProfile={userProfile}/>
       ) : (
         <>
           <AnctStepNav activeStep={activeStep} onStepClick={goToStep} />

@@ -26,6 +26,7 @@ const MENU_ADMIN = [
       { key: "rekap-pnc", label: "Lihat Form PNC", href: "/admin/dataPnc", icon: "healing" },
       { key: "rekap-anct", label: "Lihat Form ANC Terpadu", href: "/admin/dataAnct", icon: "biotech" },
       { key: "rekap-kematian", label: "Data Kematian Ibu", href: "/admin/dataKematian", icon: "heart_broken" },
+      { key: "sdm", label: "Kelola SDM", href: "/admin/dataSdm", icon: "groups" },
       { key: "sasaran", label: "Sasaran Puskesmas", href: "/admin/dataSasaran", icon: "flag" },
     ],
   },

@@ -1,20 +1,22 @@
-// app/dashboard/kematian/page.js
-// Halaman Form Input Kematian Ibu (berdasarkan Sebab) Petugas Puskesmas.
-// Satu halaman form (tidak wizard, cuma 2 kelompok field) + tab Rekapitulasi.
+// app/dashboard/sdm/page.js
+// Halaman Form Input SDM & Fasilitas Kesehatan Petugas Puskesmas.
+// PENTING: data ini KUMULATIF — angka bulan ini sudah mencakup bulan
+// sebelumnya. Saat dokumen bulan baru dibuat, nilainya otomatis diisi
+// dari laporan bulan sebelumnya (tinggal dikoreksi kalau ada perubahan).
 
 'use client';
 
 import { useState, useEffect } from 'react';
 import { formatPeriode } from '@/constants/periode';
-import { useKematianPeriode } from '@/lib/kematian/useKematianPeriode';
-import { useKematianFormData } from '@/lib/kematian/useKematianFormData';
-import { STATUS_DRAFT } from '@/lib/kematian/kematianConfig';
+import { useSdmPeriode } from '@/lib/sdm/useSdmPeriode';
+import { useSdmFormData } from '@/lib/sdm/useSdmFormData';
+import { STATUS_DRAFT } from '@/lib/sdm/sdmConfig';
 
 import PeriodeBulanCard from '@/components/shared/PeriodeBulanCard';
-import StepKematian from '@/components/kematian/form/StepKematian';
-import KematianReportTablePreview from '@/components/kematian/table/KematianReportTablePreview';
+import StepSdm from '@/components/sdm/form/StepSdm';
+import SdmReportTablePreview from '@/components/sdm/table/SdmReportTablePreview';
 
-export default function FormKematianPage() {
+export default function FormSdmPage() {
   const [activeViewTab, setActiveViewTab] = useState('wizard');
   const [isAdminFlag, setIsAdminFlag] = useState(false);
 
@@ -27,7 +29,7 @@ export default function FormKematianPage() {
     periodeLoading,
     isEditable,
     isReadOnly,
-  } = useKematianPeriode({ isAdmin: isAdminFlag });
+  } = useSdmPeriode({ isAdmin: isAdminFlag });
 
   const {
     loading,
@@ -36,11 +38,12 @@ export default function FormKematianPage() {
     userProfile,
     formData,
     periodDocExists,
+    diisiOtomatisDariBulanLalu,
     loadMonth,
     saveToFirestore,
     handleInputChange,
     handleFinalSubmit,
-  } = useKematianFormData({ selectedYear, selectedMonth, isReadOnly });
+  } = useSdmFormData({ selectedYear, selectedMonth, isReadOnly });
 
   useEffect(() => {
     if (!isAdminFlag && userProfile?.role === 'admin_dinkes') {
@@ -60,7 +63,7 @@ export default function FormKematianPage() {
   const onFinalSubmit = async () => {
     const ok = await handleFinalSubmit();
     if (ok) {
-      alert(`Laporan Kematian Ibu untuk ${formatPeriode(selectedYear, selectedMonth)} berhasil disimpan dan ditandai selesai!`);
+      alert(`Laporan SDM untuk ${formatPeriode(selectedYear, selectedMonth)} berhasil disimpan dan ditandai selesai!`);
       window.location.href = '/dashboard';
     }
   };
@@ -70,7 +73,7 @@ export default function FormKematianPage() {
       <div className="min-h-screen flex items-center justify-center bg-surface text-on-surface">
         <div className="text-center space-y-3">
           <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-on-surface-variant font-medium text-xs">Memuat Halaman Form Kematian Ibu...</p>
+          <p className="text-on-surface-variant font-medium text-xs">Memuat Halaman Form SDM...</p>
         </div>
       </div>
     );
@@ -89,7 +92,7 @@ export default function FormKematianPage() {
     <main className="flex-1 p-margin-desktop bg-surface max-w-container-max mx-auto w-full flex flex-col gap-6">
       <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="font-bold text-lg text-primary">Form Kematian Ibu — {puskesmasName}</h1>
+          <h1 className="font-bold text-lg text-primary">Form SDM & Fasilitas Kesehatan — {puskesmasName}</h1>
           <p className="text-xs text-on-surface-variant mt-0.5">
             Periode: <span className="font-semibold">{periodLabel}</span>
           </p>
@@ -99,6 +102,11 @@ export default function FormKematianPage() {
           {autoSaveStatus === 'saved' && <span className="text-emerald-600 font-medium">Tersimpan</span>}
           {autoSaveStatus === 'error' && <span className="text-red-600 font-medium">Gagal menyimpan</span>}
         </div>
+      </div>
+
+      <div className="bg-blue-50 border border-blue-300 rounded-lg p-3 text-sm text-blue-800">
+        <strong>Data SDM diisi KUMULATIF</strong> — angka yang diisi harus TOTAL sampai bulan ini
+        (sudah termasuk bulan-bulan sebelumnya), bukan cuma penambahan bulan ini saja.
       </div>
 
       <PeriodeBulanCard
@@ -138,7 +146,7 @@ export default function FormKematianPage() {
       </div>
 
       {activeViewTab === 'preview' ? (
-        <KematianReportTablePreview selectedMonth={selectedMonth} selectedYear={selectedYear} userProfile={userProfile} />
+        <SdmReportTablePreview selectedMonth={selectedMonth} selectedYear={selectedYear} />
       ) : (
         <>
           {!periodDocExists && (
@@ -151,13 +159,18 @@ export default function FormKematianPage() {
               Periode ini terkunci — data hanya bisa dilihat, tidak bisa diubah.
             </div>
           )}
+          {diisiOtomatisDariBulanLalu && !isReadOnly && (
+            <div className="bg-emerald-50 border border-emerald-300 rounded-lg p-3 text-sm text-emerald-800">
+              Nilai di bawah otomatis diisi dari laporan bulan sebelumnya. Silakan koreksi kalau ada perubahan.
+            </div>
+          )}
 
           <div
             className={`bg-surface-container-lowest border rounded-xl p-6 shadow-sm ${
               isReadOnly ? 'border-rose-200' : 'border-outline-variant'
             }`}
           >
-            <StepKematian values={formData} onChange={handleInputChange} disabled={disabled} />
+            <StepSdm values={formData} onChange={handleInputChange} disabled={disabled} />
 
             {!isReadOnly && periodDocExists && (
               <div className="flex justify-end gap-3 mt-8 pt-4 border-t border-outline-variant">
