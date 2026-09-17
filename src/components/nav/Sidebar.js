@@ -27,23 +27,23 @@ const MENU_PETUGAS = [
       {
         key: "anc",
         label: "ANC",
-        href: "/dashboard/anc",
+        href: "/dashboard/dataIbu/anc",
         icon: "monitor_heart",
       },
-      { key: "pnc", label: "PNC", href: "/dashboard/pnc", icon: "healing" },
+      { key: "pnc", label: "PNC", href: "/dashboard/dataIbu/pnc", icon: "healing" },
       {
         key: "kematian",
         label: "Kematian Ibu",
-        href: "/dashboard/kematian",
+        href: "/dashboard/dataIbu/kematian",
         icon: "heart_broken",
       },
       {
         key: "anc-terpadu",
         label: "ANC Terpadu",
-        href: "/dashboard/anct",
+        href: "/dashboard/dataIbu/anct",
         icon: "biotech",
       },
-      { key: "sdm", label: "SDM", href: "/dashboard/sdm", icon: "groups" },
+      { key: "sdm", label: "SDM", href: "/dashboard/dataIbu/sdm", icon: "groups" },
     ],
   },
   {
