@@ -14,20 +14,62 @@ import { auth } from "@/lib/firebase";
 // manajemen inti Admin yang dipakai lintas semua program, bukan spesifik
 // satu area data.
 const MENU_ADMIN = [
-  { type: "link", key: "dashboard", label: "Dashboard", href: "/admin/dashboard", icon: "dashboard" },
-  { type: "link", key: "periode", label: "Periode Pelaporan", href: "/admin/periode", icon: "event_available" },
+  {
+    type: "link",
+    key: "dashboard",
+    label: "Dashboard",
+    href: "/admin/dashboard",
+    icon: "dashboard",
+  },
+  {
+    type: "link",
+    key: "periode",
+    label: "Periode Pelaporan",
+    href: "/admin/periode",
+    icon: "event_available",
+  },
   {
     type: "group",
     key: "data-ibu",
     label: "Data Ibu",
     icon: "pregnant_woman",
     children: [
-      { key: "rekap-anc", label: "Lihat Form ANC", href: "/admin/dataAnc", icon: "monitor_heart" },
-      { key: "rekap-pnc", label: "Lihat Form PNC", href: "/admin/dataPnc", icon: "healing" },
-      { key: "rekap-anct", label: "Lihat Form ANC Terpadu", href: "/admin/dataAnct", icon: "biotech" },
-      { key: "rekap-kematian", label: "Data Kematian Ibu", href: "/admin/dataKematian", icon: "heart_broken" },
-      { key: "sdm", label: "Kelola SDM", href: "/admin/dataSdm", icon: "groups" },
-      { key: "sasaran", label: "Sasaran Puskesmas", href: "/admin/dataSasaran", icon: "flag" },
+      {
+        key: "rekap-anc",
+        label: "Lihat Form ANC",
+        href: "/admin/dataIbu/dataAnc",
+        icon: "monitor_heart",
+      },
+      {
+        key: "rekap-pnc",
+        label: "Lihat Form PNC",
+        href: "/admin/dataIbu/dataPnc",
+        icon: "healing",
+      },
+      {
+        key: "rekap-anct",
+        label: "Lihat Form ANC Terpadu",
+        href: "/admin/dataIbu/dataAnct",
+        icon: "biotech",
+      },
+      {
+        key: "rekap-kematian",
+        label: "Data Kematian Ibu",
+        href: "/admin/dataIbu/dataKematian",
+        icon: "heart_broken",
+      },
+      {
+        key: "sdm",
+        label: "Kelola SDM",
+        href: "/admin/dataIbu/dataSdm",
+        icon: "groups",
+      },
+      {
+        key: "sasaran",
+        label: "Sasaran Puskesmas",
+        href: "/admin/dataIbu/dataSasaran",
+        icon: "flag",
+      },
     ],
   },
   {
@@ -36,12 +78,79 @@ const MENU_ADMIN = [
     label: "Data Anak",
     icon: "child_care",
     children: [
-      // Akan diisi menyusul saat modul Data Anak dibangun.
-      { key: "anak-segera", label: "Segera Hadir", href: "#", icon: "hourglass_empty", disabled: true },
+      {
+        key: "rekap-kn",
+        label: "Pelayanan Neonatal (KN)",
+        href: "/admin/dataAnak/dataKn",
+        icon: "baby_changing_station",
+      },
+      {
+        key: "kematian-bayi",
+        label: "Kematian Bayi (Neo + Post Neo)",
+        href: "/admin/dataAnak/dataKematianBayi",
+        icon: "heart_broken",
+      },
+      {
+        key: "pelayanan-balita",
+        label: "Pel. Balita dan Kematian",
+        href: "/admin/dataAnak/dataBalita",
+        icon: "personal_injury",
+      },
     ],
   },
-  { type: "link", key: "petugas", label: "Manajemen User", href: "/admin/petugas", icon: "manage_accounts" },
-  { type: "link", key: "profil", label: "Profil & Pengaturan", href: "/admin/profil", icon: "person" },
+  {
+    type: "group",
+    key: "mtbs",
+    label: "MTBS",
+    icon: "sick",
+    children: [
+      {
+        key: "mtbs-balita",
+        label: "MTBS (Balita Sakit 2-59 Bln)",
+        href: "/admin/dataMtbs/mtbs",
+        icon: "sick",
+      },
+      {
+        key: "mtbm-bayi",
+        label: "MTBM (Bayi Muda 0-2 Bln)",
+        href: "/admin/dataMtbs/mtbm",
+        icon: "child_friendly",
+      },
+    ],
+  },
+  {
+  type: "group",
+  key: "kesprocatin-kb",
+  label: "KESPROCATIN & KB",
+  icon: "diversity_1",
+  children: [
+    { key: "sasaran-kb", label: "Sasaran KB", href: "/admin/dataKb/dataSasaranKb", icon: "flag" },
+    { key: "kesprocatin", label: "Kesprocatin (Catin)", href: "/admin/dataKesprocatin", icon: "diversity_3", disabled: true },
+    { key: "kb-aktif", label: "KB Aktif", href: "/admin/dataKbAktif", icon: "family_restroom", disabled: true },
+    { key: "kb-4t-alki", label: "KB 4T / ALKI", href: "/admin/dataKb4tAlki", icon: "shield", disabled: true },
+  ],
+  },
+  {
+    type: "link",
+    key: "shk",
+    label: "Pelayanan SHK",
+    href: "/admin/dataShk/shk",
+    icon: "medical_services",
+  },
+  {
+    type: "link",
+    key: "petugas",
+    label: "Manajemen User",
+    href: "/admin/petugas",
+    icon: "manage_accounts",
+  },
+  {
+    type: "link",
+    key: "profil",
+    label: "Profil & Pengaturan",
+    href: "/admin/profil",
+    icon: "person",
+  },
 ];
 
 export default function AdminSidebar({ activeTab }) {
@@ -64,7 +173,10 @@ export default function AdminSidebar({ activeTab }) {
   useEffect(() => {
     const initialOpen = {};
     MENU_ADMIN.forEach((item) => {
-      if (item.type === "group" && item.children.some((c) => getIsActive(c.key, c.href))) {
+      if (
+        item.type === "group" &&
+        item.children.some((c) => getIsActive(c.key, c.href))
+      ) {
         initialOpen[item.key] = true;
       }
     });
@@ -81,8 +193,8 @@ export default function AdminSidebar({ activeTab }) {
       disabled
         ? "text-on-surface-variant/40 cursor-not-allowed"
         : active
-        ? "bg-primary-container text-on-primary-container font-bold scale-95"
-        : "text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high"
+          ? "bg-primary-container text-on-primary-container font-bold scale-95"
+          : "text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high"
     }`;
 
   return (
@@ -112,7 +224,11 @@ export default function AdminSidebar({ activeTab }) {
           if (item.type === "link") {
             const active = getIsActive(item.key, item.href);
             return (
-              <Link key={item.key} href={item.href} className={linkClass(active)}>
+              <Link
+                key={item.key}
+                href={item.href}
+                className={linkClass(active)}
+              >
                 <span className="material-symbols-outlined">{item.icon}</span>
                 <span>{item.label}</span>
               </Link>
@@ -121,7 +237,9 @@ export default function AdminSidebar({ activeTab }) {
 
           // type === "group"
           const isOpen = !!openGroups[item.key];
-          const hasActiveChild = item.children.some((c) => getIsActive(c.key, c.href));
+          const hasActiveChild = item.children.some((c) =>
+            getIsActive(c.key, c.href),
+          );
 
           return (
             <div key={item.key} className="flex flex-col">
@@ -156,7 +274,9 @@ export default function AdminSidebar({ activeTab }) {
                         onClick={(e) => child.disabled && e.preventDefault()}
                         className={linkClass(active, child.disabled)}
                       >
-                        <span className="material-symbols-outlined text-[20px]">{child.icon}</span>
+                        <span className="material-symbols-outlined text-[20px]">
+                          {child.icon}
+                        </span>
                         <span className="text-sm">{child.label}</span>
                       </Link>
                     );

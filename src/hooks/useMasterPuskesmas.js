@@ -11,15 +11,22 @@
 // sudah baca field sasaranBumil/sasaranBulin dari dokumen laporan yang
 // sama persis.
 
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { collection, getDocs, doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { useManajemenPeriode } from '@/hooks/useManajemenPeriode';
-import { DAFTAR_BULAN, STATUS_TERKUNCI } from '@/constants/periode';
-import { getAncCollectionName } from '@/lib/anc/ancConfig';
-import { getPncCollectionName } from '@/lib/pnc/pncConfig';
+import { useState, useEffect, useCallback } from "react";
+import {
+  collection,
+  getDocs,
+  doc,
+  getDoc,
+  setDoc,
+  serverTimestamp,
+} from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import { useManajemenPeriode } from "@/hooks/useManajemenPeriode";
+import { DAFTAR_BULAN, STATUS_TERKUNCI } from "@/constants/periode";
+import { getAncCollectionName } from "@/lib/ibu/anc/ancConfig";
+import { getPncCollectionName } from "@/lib/ibu/pnc/pncConfig";
 
 export function useDataSasaranPeriode() {
   const {
@@ -51,14 +58,16 @@ export function useDataSasaranPeriode() {
   });
 
   // ---- Periode terpilih sudah dibuka atau belum ----
-  const periodeSudahDibuka = selectedMonth ? openedMonths.includes(selectedMonth) : false;
+  const periodeSudahDibuka = selectedMonth
+    ? openedMonths.includes(selectedMonth)
+    : false;
 
   // ---- Ambil data: semua Puskesmas + sasaran bulan terpilih dari doc ANC & PNC ----
   const loadRows = useCallback(async (year, month) => {
     if (!year || !month) return;
     setLoading(true);
     try {
-      const puskesmasSnap = await getDocs(collection(db, 'puskesmas'));
+      const puskesmasSnap = await getDocs(collection(db, "puskesmas"));
       const ancCollectionName = getAncCollectionName(year, month);
       const pncCollectionName = getPncCollectionName(year, month);
 
@@ -67,7 +76,10 @@ export function useDataSasaranPeriode() {
           const pData = pDoc.data();
           const ancRef = doc(db, ancCollectionName, pDoc.id);
           const pncRef = doc(db, pncCollectionName, pDoc.id);
-          const [ancSnap, pncSnap] = await Promise.all([getDoc(ancRef), getDoc(pncRef)]);
+          const [ancSnap, pncSnap] = await Promise.all([
+            getDoc(ancRef),
+            getDoc(pncRef),
+          ]);
           const ancData = ancSnap.exists() ? ancSnap.data() : {};
           const pncData = pncSnap.exists() ? pncSnap.data() : {};
 
@@ -81,13 +93,13 @@ export function useDataSasaranPeriode() {
             // Hanya sasaranBulin yang dibaca dari dokumen PNC
             sasaranBulin: pncData.sasaranBulin ?? pData.sasaranBulin ?? 0,
           };
-        })
+        }),
       );
 
-      data.sort((a, b) => (a.nama || '').localeCompare(b.nama || ''));
+      data.sort((a, b) => (a.nama || "").localeCompare(b.nama || ""));
       setRows(data);
     } catch (err) {
-      console.error('useDataSasaranPeriode loadRows error:', err);
+      console.error("useDataSasaranPeriode loadRows error:", err);
       setRows([]);
     } finally {
       setLoading(false);
@@ -101,7 +113,9 @@ export function useDataSasaranPeriode() {
   }, [selectedYear, selectedMonth, loadRows]);
 
   const updateLocalValue = (id, field, value) => {
-    setRows((prev) => prev.map((row) => (row.id === id ? { ...row, [field]: value } : row)));
+    setRows((prev) =>
+      prev.map((row) => (row.id === id ? { ...row, [field]: value } : row)),
+    );
   };
 
   // ---- Simpan satu baris: tulis ke doc ANC (jumlahPenduduk, sasaranBumil, sasaranWus)
@@ -112,8 +126,14 @@ export function useDataSasaranPeriode() {
 
     setSavingId(row.id);
     try {
-      const ancCollectionName = getAncCollectionName(selectedYear, selectedMonth);
-      const pncCollectionName = getPncCollectionName(selectedYear, selectedMonth);
+      const ancCollectionName = getAncCollectionName(
+        selectedYear,
+        selectedMonth,
+      );
+      const pncCollectionName = getPncCollectionName(
+        selectedYear,
+        selectedMonth,
+      );
 
       await Promise.all([
         setDoc(
@@ -124,7 +144,7 @@ export function useDataSasaranPeriode() {
             sasaranWus: Number(row.sasaranWus) || 0,
             updatedAt: serverTimestamp(),
           },
-          { merge: true }
+          { merge: true },
         ),
         setDoc(
           doc(db, pncCollectionName, row.id),
@@ -132,12 +152,12 @@ export function useDataSasaranPeriode() {
             sasaranBulin: Number(row.sasaranBulin) || 0,
             updatedAt: serverTimestamp(),
           },
-          { merge: true }
+          { merge: true },
         ),
       ]);
       return true;
     } catch (err) {
-      console.error('useDataSasaranPeriode saveRow error:', err);
+      console.error("useDataSasaranPeriode saveRow error:", err);
       return false;
     } finally {
       setSavingId(null);

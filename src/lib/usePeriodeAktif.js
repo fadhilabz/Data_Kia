@@ -16,8 +16,8 @@ import { useState, useEffect, useCallback } from "react";
 import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { usePeriodeAktif } from "@/hooks/useManajemenPeriode";
-import { getPncCollectionName, LIST_BULAN } from "@/lib/pnc/pncConfig";
-import { PNC_FIELDS } from "@/lib/pnc/pncFields";
+import { getPncCollectionName, LIST_BULAN } from "@/lib/ibu/pnc/pncConfig";
+import { PNC_FIELDS } from "@/lib/ibu/pnc/pncFields";
 
 function getCurrentMonthYear() {
   const now = new Date();

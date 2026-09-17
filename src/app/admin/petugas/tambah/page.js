@@ -1,52 +1,55 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { getAncCollectionName, TEMPLATE_KOLOM_ANC } from '@/lib/anc/ancConfig';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import {
+  getAncCollectionName,
+  TEMPLATE_KOLOM_ANC,
+} from "@/lib/ibu/anc/ancConfig";
 
 export default function TambahPetugasPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    role: 'petugas',
-    puskesmas: 'Puskesmas Katobengke',
-    nip: '',
-    phone: '',
-    status: 'active',
+    name: "",
+    email: "",
+    role: "petugas",
+    puskesmas: "Puskesmas Katobengke",
+    nip: "",
+    phone: "",
+    status: "active",
   });
 
   // Daftar resmi 17 Puskesmas sesuai data SASARAN (Excel Data Ibu 2026 Baubau).
   // JANGAN diubah sendiri-sendiri di file lain — kalau perlu tambah/ubah nama,
   // ubah di sini saja supaya seluruh aplikasi tetap pakai daftar yang sama.
   const daftarPuskesmas = [
-    'Puskesmas Katobengke',
-    'Puskesmas Wajo',
-    'Puskesmas Betoambari',
-    'Puskesmas Meo-Meo',
-    'Puskesmas Bataraguru',
-    'Puskesmas Wolio',
-    'Puskesmas Sorawolio',
-    'Puskesmas Liwuto',
-    'Puskesmas Lakologou',
-    'Puskesmas Kadolomoko',
-    'Puskesmas Bungi',
-    'Puskesmas BWI',
-    'Puskesmas Lowu-Lowu',
-    'Puskesmas Kampeonaho',
-    'Puskesmas Waborobo',
-    'Puskesmas Melai',
-    'Puskesmas Sulaa',
+    "Puskesmas Katobengke",
+    "Puskesmas Wajo",
+    "Puskesmas Betoambari",
+    "Puskesmas Meo-Meo",
+    "Puskesmas Bataraguru",
+    "Puskesmas Wolio",
+    "Puskesmas Sorawolio",
+    "Puskesmas Liwuto",
+    "Puskesmas Lakologou",
+    "Puskesmas Kadolomoko",
+    "Puskesmas Bungi",
+    "Puskesmas BWI",
+    "Puskesmas Lowu-Lowu",
+    "Puskesmas Kampeonaho",
+    "Puskesmas Waborobo",
+    "Puskesmas Melai",
+    "Puskesmas Sulaa",
   ];
 
   const slugifyPuskesmas = (namaPuskesmas) =>
     namaPuskesmas
       .toLowerCase()
-      .replace(/\s+/g, '-')
-      .replace(/[^a-z0-9-]/g, '');
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -58,13 +61,13 @@ export default function TambahPetugasPage() {
   // lewat halaman Kelola Sasaran tidak hilang) — hanya field identitas dasar
   // yang di-merge kalau dokumennya baru pertama kali dibuat.
   const ensurePuskesmasExists = async (puskesmasId, namaPuskesmas) => {
-    const puskesmasRef = doc(db, 'puskesmas', puskesmasId);
+    const puskesmasRef = doc(db, "puskesmas", puskesmasId);
     const puskesmasSnap = await getDoc(puskesmasRef);
 
     if (!puskesmasSnap.exists()) {
       await setDoc(puskesmasRef, {
         nama: namaPuskesmas,
-        kecamatan: '',
+        kecamatan: "",
         sasaranBumil: 0,
         sasaranBulin: 0,
         createdAt: serverTimestamp(),
@@ -79,7 +82,7 @@ export default function TambahPetugasPage() {
   // terdaftar, buatkan dokumen laporannya untuk bulan-bulan tersebut juga —
   // supaya Puskesmas baru tidak "ketinggalan" dan tetap bisa isi laporan.
   const backfillOpenedPeriods = async (puskesmasId, namaPuskesmas, tahun) => {
-    const openedRef = doc(db, 'settings', 'opened_periods');
+    const openedRef = doc(db, "settings", "opened_periods");
     const openedSnap = await getDoc(openedRef);
     if (!openedSnap.exists()) return;
 
@@ -98,7 +101,7 @@ export default function TambahPetugasPage() {
           ...TEMPLATE_KOLOM_ANC,
           puskesmasId,
           namaPuskesmas,
-          statusReport: 'draft',
+          statusReport: "draft",
           updatedAt: serverTimestamp(),
         });
       }
@@ -115,11 +118,14 @@ export default function TambahPetugasPage() {
       const currentYear = String(new Date().getFullYear());
 
       // 1. Pastikan dokumen master Puskesmas ada
-      const puskesmasBaruDibuat = await ensurePuskesmasExists(puskesmasId, formData.puskesmas);
+      const puskesmasBaruDibuat = await ensurePuskesmasExists(
+        puskesmasId,
+        formData.puskesmas,
+      );
 
       // 2. Simpan/perbarui akun user
       await setDoc(
-        doc(db, 'users', emailDocId),
+        doc(db, "users", emailDocId),
         {
           email: emailDocId,
           name: formData.name,
@@ -132,7 +138,7 @@ export default function TambahPetugasPage() {
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
         },
-        { merge: true }
+        { merge: true },
       );
 
       // 3. Backfill dokumen periode yang sudah terlanjur dibuka Admin sebelumnya,
@@ -141,13 +147,13 @@ export default function TambahPetugasPage() {
 
       alert(
         puskesmasBaruDibuat
-          ? 'Berhasil menambah petugas! Puskesmas ini baru pertama kali terdaftar — dokumen laporan untuk periode yang sudah dibuka juga sudah disiapkan.'
-          : 'Berhasil menambah data petugas!'
+          ? "Berhasil menambah petugas! Puskesmas ini baru pertama kali terdaftar — dokumen laporan untuk periode yang sudah dibuka juga sudah disiapkan."
+          : "Berhasil menambah data petugas!",
       );
-      router.push('/admin/petugas');
+      router.push("/admin/petugas");
     } catch (error) {
-      console.error('Error adding petugas:', error);
-      alert('Gagal menambah data petugas: ' + error.message);
+      console.error("Error adding petugas:", error);
+      alert("Gagal menambah data petugas: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -156,12 +162,14 @@ export default function TambahPetugasPage() {
   return (
     <main className=" bg-surface-container-lowest p-6 lg:p-10 text-on-surface">
       <div className="max-w-3xl mx-auto space-y-6">
-
         <div className="flex items-center justify-between border-b border-outline-variant pb-4">
           <div>
-            <h1 className="text-2xl font-bold text-primary">Tambah Petugas Baru</h1>
+            <h1 className="text-2xl font-bold text-primary">
+              Tambah Petugas Baru
+            </h1>
             <p className="text-xs text-on-surface-variant mt-1">
-              Tambahkan akun petugas Puskesmas atau Admin Dinkes ke dalam sistem Data Ibu Baubau
+              Tambahkan akun petugas Puskesmas atau Admin Dinkes ke dalam sistem
+              Data Ibu Baubau
             </p>
           </div>
           <button
@@ -173,8 +181,10 @@ export default function TambahPetugasPage() {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-surface-container-low p-6 rounded-2xl border border-outline-variant shadow-sm space-y-5">
-
+        <form
+          onSubmit={handleSubmit}
+          className="bg-surface-container-low p-6 rounded-2xl border border-outline-variant shadow-sm space-y-5"
+        >
           <div>
             <label className="block text-xs font-bold text-on-surface-variant mb-1">
               Nama Lengkap & Gelar <span className="text-red-500">*</span>
@@ -192,7 +202,8 @@ export default function TambahPetugasPage() {
 
           <div>
             <label className="block text-xs font-bold text-on-surface-variant mb-1">
-              Alamat Email (Google Account) <span className="text-red-500">*</span>
+              Alamat Email (Google Account){" "}
+              <span className="text-red-500">*</span>
             </label>
             <input
               type="email"
@@ -204,7 +215,8 @@ export default function TambahPetugasPage() {
               className="w-full px-4 py-2.5 bg-surface-container-highest border-none rounded-xl text-xs text-on-surface focus:ring-2 focus:ring-primary outline-none"
             />
             <p className="text-[10px] text-on-surface-variant mt-1">
-              *Email harus sesuai dengan akun Google yang digunakan petugas untuk Login.
+              *Email harus sesuai dengan akun Google yang digunakan petugas
+              untuk Login.
             </p>
           </div>
 
@@ -235,7 +247,9 @@ export default function TambahPetugasPage() {
                 className="w-full px-4 py-2.5 bg-surface-container-highest border-none rounded-xl text-xs text-on-surface focus:ring-2 focus:ring-primary outline-none"
               >
                 {daftarPuskesmas.map((p) => (
-                  <option key={p} value={p}>{p}</option>
+                  <option key={p} value={p}>
+                    {p}
+                  </option>
                 ))}
               </select>
             </div>
@@ -272,14 +286,30 @@ export default function TambahPetugasPage() {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-on-surface-variant mb-1">Status Akun</label>
+            <label className="block text-xs font-bold text-on-surface-variant mb-1">
+              Status Akun
+            </label>
             <div className="flex items-center gap-6 mt-1">
               <label className="flex items-center gap-2 text-xs cursor-pointer">
-                <input type="radio" name="status" value="active" checked={formData.status === 'active'} onChange={handleChange} className="accent-primary" />
+                <input
+                  type="radio"
+                  name="status"
+                  value="active"
+                  checked={formData.status === "active"}
+                  onChange={handleChange}
+                  className="accent-primary"
+                />
                 <span>Aktif</span>
               </label>
               <label className="flex items-center gap-2 text-xs cursor-pointer">
-                <input type="radio" name="status" value="inactive" checked={formData.status === 'inactive'} onChange={handleChange} className="accent-primary" />
+                <input
+                  type="radio"
+                  name="status"
+                  value="inactive"
+                  checked={formData.status === "inactive"}
+                  onChange={handleChange}
+                  className="accent-primary"
+                />
                 <span>Non-Aktif</span>
               </label>
             </div>
@@ -302,13 +332,14 @@ export default function TambahPetugasPage() {
                 <span>Menyimpan...</span>
               ) : (
                 <>
-                  <span className="material-symbols-outlined text-sm">person_add</span>
+                  <span className="material-symbols-outlined text-sm">
+                    person_add
+                  </span>
                   Simpan Petugas
                 </>
               )}
             </button>
           </div>
-
         </form>
       </div>
     </main>

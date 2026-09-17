@@ -74,16 +74,16 @@ export default function LoginPage() {
         <div className="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm p-8 flex flex-col items-center">
           {/* Logo & Branding */}
           <div className="mb-6 text-center">
-            <div className="w-20 h-24 mx-auto mb-4 flex items-center justify-center">
+            <div className="w-48 h-48 mx-auto mb-4 flex items-center justify-center">
               <img
                 className="h-full object-contain"
                 data-alt="A highly polished, minimalist vector emblem representing a modern government health department. The design features a stylized crest incorporating elements of medical care and community, rendered in sharp teal and deep navy blue against a pure white background. The lines are precise and clean, reflecting a professional corporate identity."
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDgndEkV5iXEWvGJE7Mx8JCwQyECRRzehPY-NEVIeJGDIhZdcsc71PufLI3ESKaUnuaCS_TZm__BomiM_rI2RVkkbXBk65gPU-fPRI5QqPz73oHGiZy-FCxj_ZprTUkUobMFSOBHhmxGJ6Y93FSotAKVurR3tRYk7btDm3j5p1mAVMWJoMjcNMLmsyRg3wKy7i9dQT1yz9iMmNuqDAyOt3AywsBws2gx-9jtcvn58YI1XeS4_a228n1og"
+                src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi9hRPvE194mfwMgTalU_nrhYNbCzVRTnlJMmkXhGUPyXSaGYSDFolhNgjWmoFOP5EXNEerUT0S5YJ7bnsrzTsuOKitBL9d02Z4OfuDFTYUTi02pI5x08T7jRN8TI_Kl6GPNRe6ojRLa791IjLWyjWOL4z3sC0533nb3F199GV0o8owZcLdyV5NMvFS_w/s1380/Logo%20Kementerian%20Kesehatan%20-%20Kemenkes.png"
                 alt="Logo Dinas Kesehatan Kota Baubau"
               />
             </div>
             <h1 className="font-headline-md text-headline-md text-primary mb-2">
-              Data Ibu Baubau
+              Data KIA Baubau
             </h1>
             <p className="font-body-md text-body-md text-on-surface-variant">
               Dinas Kesehatan Kota Baubau

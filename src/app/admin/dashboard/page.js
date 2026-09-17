@@ -1,12 +1,15 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
-import { auth, db } from '@/lib/firebase';
-import { getActivePeriode, namaBulan as getNamaBulan } from '@/lib/anc/ancConfig';
-import RekapKelengkapanCard from '@/components/shared/RekapKelengkapanCard';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "@/lib/firebase";
+import {
+  getActivePeriode,
+  namaBulan as getNamaBulan,
+} from "@/lib/ibu/anc/ancConfig";
+import RekapKelengkapanCard from "@/components/shared/RekapKelengkapanCard";
 
 export default function AdminDashboardPage() {
   const router = useRouter();
@@ -17,27 +20,27 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        router.push('/');
+        router.push("/");
         return;
       }
 
       try {
         // 1. Ambil Profil User
-        const userRef = doc(db, 'users', user.email);
+        const userRef = doc(db, "users", user.email);
         const userSnap = await getDoc(userRef);
 
         if (userSnap.exists()) {
           const userData = userSnap.data();
-          
+
           // Proteksi: Jika bukan role dinkes/admin, kembalikan ke dashboard puskesmas
-          if (userData.role !== 'dinkes' && userData.role !== 'admin') {
-            router.push('/dashboard');
+          if (userData.role !== "dinkes" && userData.role !== "admin") {
+            router.push("/dashboard");
             return;
           }
-          
+
           setUserProfile(userData);
         } else {
-          router.push('/');
+          router.push("/");
           return;
         }
 
@@ -47,7 +50,7 @@ export default function AdminDashboardPage() {
           setPeriode(activeData);
         }
       } catch (err) {
-        console.error('Error loading admin dashboard:', err);
+        console.error("Error loading admin dashboard:", err);
       } finally {
         setLoading(false);
       }
@@ -58,18 +61,30 @@ export default function AdminDashboardPage() {
 
   const handleLogout = async () => {
     await signOut(auth);
-    router.push('/');
+    router.push("/");
   };
 
   const namaBulan = [
-    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember",
   ];
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <p className="text-gray-600 font-medium">Memuat Dashboard Admin Dinkes...</p>
+        <p className="text-gray-600 font-medium">
+          Memuat Dashboard Admin Dinkes...
+        </p>
       </div>
     );
   }
@@ -87,8 +102,12 @@ export default function AdminDashboardPage() {
           </div>
           <div className="flex items-center gap-4">
             <div className="text-right hidden sm:block">
-              <p className="text-sm font-medium">{userProfile?.name || 'Administrator'}</p>
-              <p className="text-xs text-teal-300 uppercase font-semibold">Dinas Kesehatan</p>
+              <p className="text-sm font-medium">
+                {userProfile?.name || "Administrator"}
+              </p>
+              <p className="text-xs text-teal-300 uppercase font-semibold">
+                Dinas Kesehatan
+              </p>
             </div>
             <button
               onClick={handleLogout}
@@ -108,27 +127,32 @@ export default function AdminDashboardPage() {
               Selamat Datang
             </span>
             <h2 className="text-2xl font-bold mt-2">
-              Halo, {userProfile?.name || 'Admin Dinas Kesehatan'}
+              Halo, {userProfile?.name || "Admin Dinas Kesehatan"}
             </h2>
             <p className="text-sm text-teal-100 mt-1 max-w-xl">
-              Selamat datang di Panel Pengawasan & Evaluasi Pelaporan Kesehatan Ibu se-Kota Baubau.
+              Selamat datang di Panel Pengawasan & Evaluasi Pelaporan Kesehatan
+              Ibu se-Kota Baubau.
             </p>
           </div>
 
           {/* Card Info Periode Aktif */}
           <div className="bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-xl text-right min-w-[220px]">
-            <p className="text-xs text-teal-200 font-medium">Periode Laporan Aktif</p>
+            <p className="text-xs text-teal-200 font-medium">
+              Periode Laporan Aktif
+            </p>
             <p className="text-lg font-bold text-white mt-0.5">
-              {periode ? `${namaBulan[periode.bulan - 1]} ${periode.tahun}` : 'Belum diatur'}
+              {periode
+                ? `${namaBulan[periode.bulan - 1]} ${periode.tahun}`
+                : "Belum diatur"}
             </p>
             <span
               className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded mt-1 uppercase ${
-                periode?.status === 'terbuka'
-                  ? 'bg-green-400 text-green-950'
-                  : 'bg-red-400 text-red-950'
+                periode?.status === "terbuka"
+                  ? "bg-green-400 text-green-950"
+                  : "bg-red-400 text-red-950"
               }`}
             >
-              Status: {periode?.status || 'Tertutup'}
+              Status: {periode?.status || "Tertutup"}
             </span>
           </div>
         </section>
@@ -143,8 +167,8 @@ export default function AdminDashboardPage() {
 
         {/* Menu Akses Cepat Admin */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div 
-            onClick={() => router.push('/admin/settings')}
+          <div
+            onClick={() => router.push("/admin/settings")}
             className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition cursor-pointer group"
           >
             <div className="flex items-center justify-between mb-2">
@@ -156,7 +180,8 @@ export default function AdminDashboardPage() {
               Kelola Periode Pelaporan
             </h3>
             <p className="text-xs text-gray-500 mt-1">
-              Buka atau kunci bulan pelaporan bulanan untuk seluruh UPTD Puskesmas.
+              Buka atau kunci bulan pelaporan bulanan untuk seluruh UPTD
+              Puskesmas.
             </p>
           </div>
 
@@ -166,11 +191,10 @@ export default function AdminDashboardPage() {
                 Rekapitulasi
               </span>
             </div>
-            <h3 className="font-bold text-gray-800">
-              Laporan 17 Puskesmas
-            </h3>
+            <h3 className="font-bold text-gray-800">Laporan 17 Puskesmas</h3>
             <p className="text-xs text-gray-500 mt-1">
-              Pantau kepatuhan input data ANC, PNC, KB, dan komplikasi dari seluruh kecamatan.
+              Pantau kepatuhan input data ANC, PNC, KB, dan komplikasi dari
+              seluruh kecamatan.
             </p>
           </div>
 
@@ -180,11 +204,10 @@ export default function AdminDashboardPage() {
                 Manajemen
               </span>
             </div>
-            <h3 className="font-bold text-gray-800">
-              Pengguna & Akses User
-            </h3>
+            <h3 className="font-bold text-gray-800">Pengguna & Akses User</h3>
             <p className="text-xs text-gray-500 mt-1">
-              Atur role akun petugas Puskesmas, pimpinan, dan staff Dinas Kesehatan.
+              Atur role akun petugas Puskesmas, pimpinan, dan staff Dinas
+              Kesehatan.
             </p>
           </div>
         </section>

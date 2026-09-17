@@ -8,8 +8,8 @@ import { auth } from "@/lib/firebase";
 
 // ---- Struktur menu Petugas Puskesmas / Kepala Puskesmas ----
 // Dikelompokkan per AREA PROGRAM (Data Ibu, Data Anak, dst), bukan per jenis
-// laporan — supaya gampang nambah area baru (mis. Data Anak) tanpa bongkar
-// struktur yang sudah ada.
+// laporan — supaya gampang nambah area baru tanpa bongkar struktur yang
+// sudah ada. Label & ikon Data Anak disamakan dengan AdminSidebar.jsx.
 const MENU_PETUGAS = [
   {
     type: "link",
@@ -52,16 +52,65 @@ const MENU_PETUGAS = [
     label: "Data Anak",
     icon: "child_care",
     children: [
-      // Akan diisi menyusul saat modul Data Anak dibangun.
       {
-        key: "anak-segera",
-        label: "Segera Hadir",
-        href: "#",
-        icon: "hourglass_empty",
-        disabled: true,
+        key: "rekap-kn",
+        label: "Pelayanan Neonatal (KN)",
+        href: "/dashboard/dataAnak/kn",
+        icon: "baby_changing_station",
+      },
+      {
+        key: "kematian-bayi",
+        label: "Kematian Bayi (Neo + Post Neo)",
+        href: "/dashboard/dataAnak/kematian-neo",
+        icon: "heart_broken",
+      },
+      {
+        key: "pelayanan-balita",
+        label: "Pel. Balita dan Kematian",
+        href: "/dashboard/dataAnak/kmb",
+        icon: "personal_injury",
       },
     ],
   },
+  {
+    type: "group",
+    key: "mtbs",
+    label: "MTBS",
+    icon: "sick",
+    children: [
+      {
+        key: "mtbs-balita",
+        label: "MTBS (Balita Sakit 2-59 Bln)",
+        href: "/dashboard/dataMtbm/mtbs",
+        icon: "sick",
+      },
+      {
+        key: "mtbm-bayi",
+        label: "MTBM (Bayi Muda 0-2 Bln)",
+        href: "/dashboard/dataMtbm/mtbm",
+        icon: "child_friendly",
+      },
+    ],
+  },
+  {
+  type: "group",
+  key: "kesprocatin-kb",
+  label: "KESPROCATIN & KB",
+  icon: "diversity_1",
+  children: [
+    { key: "kesprocatin", label: "Kesprocatin (Catin)", href: "/dashboard/dataKb/kesprocatin", icon: "diversity_3" },
+    { key: "kb-aktif", label: "KB Aktif", href: "/admin/dataKbAktif", icon: "family_restroom", disabled: true },
+    { key: "kb-4t-alki", label: "KB 4T / ALKI", href: "/admin/dataKb4tAlki", icon: "shield", disabled: true },
+  ],
+  },
+  {
+  type: "link",
+  key: "shk",
+  label: "Pelayanan SHK",
+  href: "/dashboard/dataShk/shk",
+  icon: "medical_services",
+  },
+  
   {
     type: "link",
     key: "profil",
@@ -71,104 +120,12 @@ const MENU_PETUGAS = [
   },
 ];
 
-// ---- Struktur menu Admin Dinas Kesehatan ----
-const MENU_ADMIN = [
-  {
-    type: "link",
-    key: "dashboard",
-    label: "Dashboard",
-    href: "/admin/dashboard",
-    icon: "dashboard",
-  },
-  {
-    type: "group",
-    key: "manajemen",
-    label: "Manajemen",
-    icon: "admin_panel_settings",
-    children: [
-      {
-        key: "periode",
-        label: "Pengaturan Periode",
-        href: "/admin/periode",
-        icon: "event_available",
-      },
-      {
-        key: "petugas",
-        label: "Manajemen User",
-        href: "/admin/petugas",
-        icon: "manage_accounts",
-      },
-    ],
-  },
-  {
-    type: "group",
-    key: "data-ibu",
-    label: "Data Ibu",
-    icon: "pregnant_woman",
-    children: [
-      {
-        key: "rekap-anc",
-        label: "Rekap ANC",
-        href: "/admin/rekap/anc",
-        icon: "monitor_heart",
-      },
-      {
-        key: "rekap-pnc",
-        label: "Rekap PNC",
-        href: "/admin/rekap/pnc",
-        icon: "healing",
-      },
-      {
-        key: "rekap-kematian",
-        label: "Rekap Kematian Ibu",
-        href: "/admin/rekap/kematian",
-        icon: "heart_broken",
-      },
-      {
-        key: "rekap-anc-terpadu",
-        label: "Rekap ANC Terpadu",
-        href: "/admin/rekap/anc-terpadu",
-        icon: "biotech",
-      },
-      { key: "sdm", label: "Kelola SDM", href: "/admin/sdm", icon: "groups" },
-      {
-        key: "sasaran",
-        label: "Kelola Sasaran",
-        href: "/admin/sasaran",
-        icon: "target",
-      },
-    ],
-  },
-  {
-    type: "group",
-    key: "data-anak",
-    label: "Data Anak",
-    icon: "child_care",
-    children: [
-      {
-        key: "anak-segera",
-        label: "Segera Hadir",
-        href: "#",
-        icon: "hourglass_empty",
-        disabled: true,
-      },
-    ],
-  },
-  {
-    type: "link",
-    key: "profil",
-    label: "Profil & Pengaturan",
-    href: "/admin/profil",
-    icon: "person",
-  },
-];
-
 export default function Sidebar({ role = "petugas" }) {
   const router = useRouter();
   const pathname = usePathname();
 
-  const menuItems = role === "admin" ? MENU_ADMIN : MENU_PETUGAS;
-  const brandLabel = role === "admin" ? "Admin Dinkes Baubau" : "Dinkes Baubau";
+  const menuItems = MENU_PETUGAS;
+  const brandLabel = "Dinkes Baubau";
 
   const [openGroups, setOpenGroups] = useState({});
 
@@ -265,7 +222,7 @@ export default function Sidebar({ role = "petugas" }) {
               {isOpen && (
                 <div className="flex flex-col gap-0.5 mt-1 ml-3 pl-3 border-l border-outline-variant">
                   {item.children.map((child) => {
-                    const active = pathname === child.href;
+                    const active = child.href !== "#" && pathname === child.href;
                     return (
                       <Link
                         key={child.key}

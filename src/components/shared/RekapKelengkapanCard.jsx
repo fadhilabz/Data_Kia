@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { subscribeRekapKelengkapan } from '@/lib/anc/ancConfig';
+import { useState, useEffect } from "react";
+import { subscribeRekapKelengkapan } from "@/lib/ibu/anc/ancConfig";
 
 export default function RekapKelengkapanCard({ periodeId, namaPeriode }) {
   const [rekap, setRekap] = useState({
@@ -26,9 +26,9 @@ export default function RekapKelengkapanCard({ periodeId, namaPeriode }) {
         setLoading(false);
       },
       (err) => {
-        console.error('RekapKelengkapanCard error:', err);
+        console.error("RekapKelengkapanCard error:", err);
         setLoading(false);
-      }
+      },
     );
 
     return () => unsubscribe();
@@ -42,7 +42,8 @@ export default function RekapKelengkapanCard({ periodeId, namaPeriode }) {
     );
   }
 
-  const { completedCount, totalPuskesmas, list, allSubmitted, noPuskesmas } = rekap;
+  const { completedCount, totalPuskesmas, list, allSubmitted, noPuskesmas } =
+    rekap;
 
   const isZeroPuskesmas = totalPuskesmas === 0 || noPuskesmas;
 
@@ -50,25 +51,33 @@ export default function RekapKelengkapanCard({ periodeId, namaPeriode }) {
     <div className="bg-surface-container-low p-5 rounded-2xl border border-outline-variant shadow-sm space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className={`material-symbols-outlined text-xl ${allSubmitted ? 'text-emerald-600' : 'text-amber-600'}`}>
-            {allSubmitted ? 'check_circle' : 'radio_button_unchecked'}
+          <span
+            className={`material-symbols-outlined text-xl ${allSubmitted ? "text-emerald-600" : "text-amber-600"}`}
+          >
+            {allSubmitted ? "check_circle" : "radio_button_unchecked"}
           </span>
           <p className="text-xs font-bold text-on-surface">
-            Status Kelengkapan Pelaporan {namaPeriode ? `— ${namaPeriode}` : ''}
+            Status Kelengkapan Pelaporan {namaPeriode ? `— ${namaPeriode}` : ""}
           </p>
         </div>
 
-        <div className={`px-3 py-1 rounded-full text-xs font-extrabold flex items-center gap-1.5 ${allSubmitted ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-900'}`}>
+        <div
+          className={`px-3 py-1 rounded-full text-xs font-extrabold flex items-center gap-1.5 ${allSubmitted ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-900"}`}
+        >
           <span className="material-symbols-outlined text-sm">
-            {allSubmitted ? 'check_circle' : 'pending_actions'}
+            {allSubmitted ? "check_circle" : "pending_actions"}
           </span>
-          <span>{completedCount} / {totalPuskesmas} Puskesmas selesai</span>
+          <span>
+            {completedCount} / {totalPuskesmas} Puskesmas selesai
+          </span>
         </div>
       </div>
 
       {isZeroPuskesmas ? (
         <div className="p-3 bg-amber-50/80 border border-amber-200/70 rounded-xl text-xs text-amber-900 font-medium flex items-center gap-2">
-          <span className="material-symbols-outlined text-base text-amber-600">warning</span>
+          <span className="material-symbols-outlined text-base text-amber-600">
+            warning
+          </span>
           <span>Belum ada master data Puskesmas.</span>
         </div>
       ) : list.length > 0 ? (
@@ -78,12 +87,14 @@ export default function RekapKelengkapanCard({ periodeId, namaPeriode }) {
               key={pkm.id}
               className={`flex items-center gap-2 text-xs px-3 py-2 rounded-lg font-medium transition-all ${
                 pkm.submitted
-                  ? 'bg-emerald-50 text-emerald-900 border border-emerald-200/60'
-                  : 'bg-rose-50/80 text-rose-800 border border-rose-200/60'
+                  ? "bg-emerald-50 text-emerald-900 border border-emerald-200/60"
+                  : "bg-rose-50/80 text-rose-800 border border-rose-200/60"
               }`}
             >
-              <span className={`material-symbols-outlined text-[18px] flex-shrink-0 ${pkm.submitted ? 'text-emerald-600' : 'text-rose-500'}`}>
-                {pkm.submitted ? 'check_circle' : 'radio_button_unchecked'}
+              <span
+                className={`material-symbols-outlined text-[18px] flex-shrink-0 ${pkm.submitted ? "text-emerald-600" : "text-rose-500"}`}
+              >
+                {pkm.submitted ? "check_circle" : "radio_button_unchecked"}
               </span>
               <span className="truncate">{pkm.nama}</span>
             </li>
